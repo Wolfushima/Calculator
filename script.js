@@ -26,3 +26,6 @@ multiply(5, 5)
 divide(10, 2)
 
 operate("divide", 40, 4)
+
+const datas = document.querySelectorAll("[data-number]"); /* Should I use Data or class to find an element */
+console.log(datas)
