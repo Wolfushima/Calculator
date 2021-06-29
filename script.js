@@ -1,7 +1,7 @@
-let displayValue = [];
-let operationToOperate = [];
-console.log(displayValue)
-const currentValue = document.querySelector(".js-currentValue");
+let valueToDisplay = [];
+let valueToOperate = [];
+console.log(valueToDisplay)
+const currentDisplayValue = document.querySelector(".js-currentValue");
 
 function addGlobalEventListener(type, selector, callback) {
     document.addEventListener(type, (e) => {
@@ -10,49 +10,49 @@ function addGlobalEventListener(type, selector, callback) {
 }
 
 addGlobalEventListener("click", ".js-number", function(e) {
-    displayValue.push(e.target.textContent);
-    operationToOperate.push(e.target.textContent);
-    currentValue.textContent = displayValue.join("");
-    console.log(displayValue);
+    valueToDisplay.push(e.target.textContent);
+    valueToOperate.push(e.target.textContent);
+    currentDisplayValue.textContent = valueToDisplay.join("");
+    console.log(valueToDisplay);
     }
 )
 
 addGlobalEventListener("click", ".js-allClear", function() {
-    displayValue = [];
-    console.log(displayValue);
-    currentValue.textContent = "";
+    valueToDisplay = [];
+    console.log(valueToDisplay);
+    currentDisplayValue.textContent = "";
     }
 )
 
 addGlobalEventListener("click", ".js-operator", function(e) {
-    if(currentValue.textContent.includes(e.target.textContent, displayValue.length - 1)) {return;}
+    if(currentDisplayValue.textContent.includes(e.target.textContent, valueToDisplay.length - 1)) {return;}
 
     if(e.target.name === "equals") {
-        console.log(operationToOperate)
-        const isOperator = operationToOperate.findIndex(operator => isNaN(operator))
+        console.log(valueToOperate)
+        const isOperator = valueToOperate.findIndex(operator => isNaN(operator))
         let left = [];
         let right = [];
         for(let i = 0; i < isOperator; i++) {
-            left.push(parseInt(operationToOperate[i]))
+            left.push(parseInt(valueToOperate[i]))
         }
-        for(let i = isOperator; i < operationToOperate.length; i++) {
-            if (isNaN(operationToOperate[i])) continue;
-            right.push(parseInt(operationToOperate[i]))
+        for(let i = isOperator; i < valueToOperate.length; i++) {
+            if (isNaN(valueToOperate[i])) continue;
+            right.push(parseInt(valueToOperate[i]))
         }
         
         console.log(left.join(""))
         console.log(right)
-        let result = operate(operationToOperate[isOperator], Number (left.join("")), Number (right.join("")))
-        currentValue.textContent = result;
+        let result = operate(valueToOperate[isOperator], Number (left.join("")), Number (right.join("")))
+        currentDisplayValue.textContent = result;
         return console.log(result)
     }
     // When you press equal, then check all the numbers before the operator, and all the numbers after the operator
     // will use findIndex to start from that value to now create a new array for left and a new one for right
 
     console.log(e.target.name)
-    displayValue.push(e.target.textContent);
-    operationToOperate.push(e.target.name);
-    currentValue.textContent = displayValue.join("");
+    valueToDisplay.push(e.target.textContent);
+    valueToOperate.push(e.target.name);
+    currentDisplayValue.textContent = valueToDisplay.join("");
 
     }
 )
@@ -96,3 +96,4 @@ function operate(operator, ...operand) {
     if(operator === "multiply") { return multiply(...operand) }
     if(operator === "divide") { return divide(...operand) }
 }
+
