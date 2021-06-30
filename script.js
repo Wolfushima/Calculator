@@ -26,15 +26,22 @@ addGlobalEventListener("click", ".js-allClear", function() {
 )
 
 addGlobalEventListener("click", ".js-operator", function(e) {
-    if(currentDisplayValue.textContent.includes(e.target.textContent, valueToDisplay.length - 1)) return;
-    if(e.target.name === "equals") {
+    if (valueToOperate.length > 0) {
+        if (isNaN(valueToOperate[valueToOperate.length - 1])) { return console.log("hel;lo")}
+    }
+
+
+    if (e.target.name === "equals") {
         if(valueToOperate.length === 0) return;
         return resultValue();
-    }
-    console.log(e.target.name)
+    };
     valueToDisplay.push(e.target.textContent);
     valueToOperate.push(e.target.name);
     currentDisplayValue.textContent = valueToDisplay.join("");
+    //console.log(valueToOperate.lastIndexOf(e.target.name))
+    console.log(valueToOperate.length)
+    console.log(valueToOperate)
+    //console.log(taco)
     }
 )
 
@@ -66,21 +73,26 @@ function operate(operator, ...operand) {
 /* --- result functions --- */
 
 function resultValue() {
-    const isOperator = valueToOperate.findIndex(operator => isNaN(operator) && operator != "point");
+    const isOperator = valueToOperate.findIndex((operator, index) => {
+        return isNaN(operator) && operator != "point" && index > 0;
+    })
     let leftOperand = [];
     let rightOperand = [];
     for(let i = 0; i < isOperator; i++) {
-        if (valueToOperate[i] === "point") { leftOperand.push(".") }
+        if (valueToOperate[i] === "substract") { leftOperand.push("-") }
+        else if (valueToOperate[i] === "point") { leftOperand.push(".") }
         else { leftOperand.push(parseInt(valueToOperate[i])) }
     }
-    for(let i = isOperator; i < valueToOperate.length; i++) {
-        if (isNaN(valueToOperate[i]) && valueToOperate[i] != "point") continue;
-        if (valueToOperate[i] === "point") { rightOperand.push(".") }
+    for(let i = isOperator + 1; i < valueToOperate.length; i++) {
+        //if (isNaN(valueToOperate[i]) && valueToOperate[i] != "point") continue;
+        if (valueToOperate[i] === "substract") { rightOperand.push("-") }
+        else if (valueToOperate[i] === "point") { rightOperand.push(".") }
         else { rightOperand.push(parseInt(valueToOperate[i])) }
     }
     result = operate(valueToOperate[isOperator], Number (leftOperand.join("")), Number (rightOperand.join("")));
     resultDisplayValue.textContent = result;
     valueToDisplay = [result];
     valueToOperate = [result];
-    return
+    //currentDisplayValue.textContent = valueToDisplay.join("");
+    return console.log(valueToOperate)
 }
