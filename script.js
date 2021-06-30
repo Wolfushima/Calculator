@@ -1,6 +1,5 @@
 let valueToDisplay = [];
 let valueToOperate = [];
-console.log(valueToDisplay)
 const currentDisplayValue = document.querySelector(".js-currentValue");
 
 function addGlobalEventListener(type, selector, callback) {
@@ -19,30 +18,34 @@ addGlobalEventListener("click", ".js-number", function(e) {
 
 addGlobalEventListener("click", ".js-allClear", function() {
     valueToDisplay = [];
+    valueToOperate = [];
     console.log(valueToDisplay);
     currentDisplayValue.textContent = "";
     }
 )
 
 addGlobalEventListener("click", ".js-operator", function(e) {
-    if(currentDisplayValue.textContent.includes(e.target.textContent, valueToDisplay.length - 1)) {return;}
-
+    if(currentDisplayValue.textContent.includes(e.target.textContent, valueToDisplay.length - 1)) return;
     if(e.target.name === "equals") {
+        if(valueToOperate.length === 0) return;
+        console.log(valueToDisplay)
         console.log(valueToOperate)
-        const isOperator = valueToOperate.findIndex(operator => isNaN(operator))
-        let left = [];
-        let right = [];
+        const isOperator = valueToOperate.findIndex(operator => isNaN(operator) && operator != "point")
+        let leftOperand = [];
+        let rightOperand = [];
         for(let i = 0; i < isOperator; i++) {
-            left.push(parseInt(valueToOperate[i]))
+            if(valueToOperate[i] === "point") leftOperand.push(".")
+            else leftOperand.push(parseInt(valueToOperate[i]))
         }
         for(let i = isOperator; i < valueToOperate.length; i++) {
-            if (isNaN(valueToOperate[i])) continue;
-            right.push(parseInt(valueToOperate[i]))
+            if (isNaN(valueToOperate[i]) && valueToOperate[i] != "point") continue;
+            if (valueToOperate[i] === "point") rightOperand.push(".")
+            else rightOperand.push(parseInt(valueToOperate[i]))
         }
-        
-        console.log(left.join(""))
-        console.log(right)
-        let result = operate(valueToOperate[isOperator], Number (left.join("")), Number (right.join("")))
+        console.log(isOperator)
+        console.log(leftOperand.join(""))
+        console.log(rightOperand.join(""))
+        let result = operate(valueToOperate[isOperator], Number (leftOperand.join("")), Number (rightOperand.join("")))
         currentDisplayValue.textContent = result;
         return console.log(result)
     }
@@ -71,7 +74,7 @@ addGlobalEventListener("click", ".js-operator", function(e) {
 
 /* --- operator functions --- */
 function add(...operand) {
-    //console.log(operand.reduce((total, currentValue) => total += currentValue))
+    console.log(operand.reduce((total, currentValue) => total += currentValue))
     return operand.reduce((total, currentValue) => total + currentValue)
 }
 
@@ -96,4 +99,3 @@ function operate(operator, ...operand) {
     if(operator === "multiply") { return multiply(...operand) }
     if(operator === "divide") { return divide(...operand) }
 }
-
