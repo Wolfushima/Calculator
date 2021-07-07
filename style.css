@@ -4,35 +4,79 @@
     box-sizing: border-box;
     padding: 0;
     margin: 0;
+    font-family: monospace;
 }
 
 html {
     margin: 0 auto;
     height: 100%;
     font-size: 60%;
-    font-family: monospace;
     text-align: center;
     min-width: max-content;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    min-height: 100vh;
+    background: linear-gradient(to right, rgba(0, 44, 0, 0.644), rgba(0, 0, 66, 0.76));
+    background-color: #08042c;
+    background-image: url(Images/Endless-Constellation.svg);
+    backdrop-filter: blur(1px);
+    /* background by SVGBackgrounds.com */
 }
 
 .calculator-container {
     display: grid;
     justify-content: center;
     align-content: center;
-    min-height: 100vh;
-    grid-template-columns: repeat(4, 100px);
-    grid-template-rows: minmax(120px, auto) repeat(5, 100px);
-    background-color: rgba(0, 0, 255, 0.164);
-    /* grid-gap: 5px; */
+    margin: auto;
+    width: min-content;
+    padding: 10px;
+    grid-template-columns: repeat(4, 50px);
+    grid-template-rows: minmax(100px, auto) repeat(5, 50px);
+    background: linear-gradient(to right, rgba(0, 132, 255, 0.63), rgb(0, 0, 248));
+    grid-gap: 0.8rem;
+    border-radius: 10px;
+    box-shadow: 0 0 2px rgba(255, 255, 255, 0.397);
 }
 
-.calculator-container > button {
+button {
     cursor: pointer;
     outline: none;
+    border-radius: 5px;
+    font-size: 20px;
+    font-weight: 400;
+    color: rgb(1, 1, 71);
+    box-shadow: 0 0 2px rgba(255, 255, 255, 0.705);
+    /* background: rgba(189, 188, 188, 0.767); */
+    background: linear-gradient(to right, rgba(189, 188, 188, 0.767), rgba(224, 223, 223, 0.856));
+}
+
+button:hover,
+.number-btn:hover,
+.result-btn:hover {
+    background: linear-gradient(to right, rgba(106, 200, 255, 0.87), rgb(0, 217, 255));
+}
+
+button + .operator-btn {
+    font-weight: 900;
+}
+
+button + .number-btn,
+.point-btn {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.664));
+}
+
+button + .result-btn {
+    background: rgb(255, 255, 255);
 }
 
 .span-two {
     grid-column: span 2;
+    font-size: 25px;
+    font-weight: 1000;
 }
 
 .display {
@@ -43,5 +87,18 @@ html {
     grid-column: 1 / -1;
     word-wrap: break-word;
     word-break: break-all;
-    background-color: aliceblue;
+    background-color: rgba(255, 255, 255, 0.787);
+    padding: 4px 16px;
+    border-radius: 5px;
+    font-weight: 700;
+    color: rgb(47, 47, 47);
+}
+
+.display .current-value {
+    color: rgba(47, 47, 47, 0.698);
+    font-size: 20px;
+}
+
+.display .result-value {
+    font-size: 30px;
 }
