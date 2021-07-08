@@ -1,11 +1,14 @@
 let valueToDisplay = [];
 let valueToOperate = [];
 let result = 0;
-
+let equalsFlag = 0;
 const currentDisplayValue = document.querySelector(".js-currentValue");
 const resultDisplayValue = document.querySelector(".js-resultValue")
 
-addGlobalEventListener("click", ".js-delete", () => console.log(`Value= ${valueToDisplay}`))
+addGlobalEventListener("click", ".js-delete", () => {
+    console.log(`%cResult= ${result}`, "color:blue;")
+    console.log(`%cValue= ${valueToDisplay}`, "color:green")
+})
 
 function addGlobalEventListener(type, selector, callback) {
     document.addEventListener(type, (e) => {
@@ -14,6 +17,13 @@ function addGlobalEventListener(type, selector, callback) {
 }
 
 addGlobalEventListener("click", ".js-number", function(e) {
+    /*          --- CHECK ---           */
+    if (equalsFlag != 0 && indexOperator() === -1) {
+        valueToDisplay = [];
+        valueToOperate = [];
+        result = 0;
+        equalsFlag = 0;
+    }
     valueToDisplay.push(Number (e.target.textContent));
     valueToOperate.push(Number (e.target.textContent));
     currentDisplayValue.textContent = valueToDisplay.join("");
@@ -29,77 +39,75 @@ addGlobalEventListener("click", ".js-allClear", function() {
 )
 
 addGlobalEventListener("click", ".js-operator", function(e) {
-    // prevents starting with a division, multiplication or sum sign
-    if (valueToOperate.length >= 0 && e.target.name != "substract" && e.target.name != "point") {
-        if (isNaN(valueToOperate[valueToOperate.length - 1])) { return console.log("hel;lo")}
+    // prevents starting with a division, multiplication or sum sign, or adding more operators at the end if there is
+    // already one that is not a substract sign or point sign
+    if (valueToOperate.length >= 0 && e.target.name != "substract" &&
+        e.target.name != "point" && isNaN(valueToOperate[valueToOperate.length - 1])) {
+        return console.log("Need number/point/- first, can't add two consecutive operators")
     }
 
-    // prevents adding two consecutive substract signs
-    if (valueToOperate[valueToOperate.length - 1] === "substract" && e.target.name === "substract") { return console.log("bro") }
-
-    // prevents adding two consecutive points
-    if (e.target.name === "point") {
-        if(valueToOperate[valueToOperate.length - 1] === "point") { return console.log("dory") }
-    }
-
-    // prevents adding a second point before/after the operator sign
-    if (valueToOperate.includes("point") && e.target.name === "point") {
-        if (valueToOperate.includes("add") || valueToOperate.includes("substract") ||
-            valueToOperate.includes("multiply") || valueToOperate.includes("divide")) {
-                let dog = valueToOperate.filter(element => element === "point");
-
-                let indexOfOperator = valueToOperate.findIndex(element => {
-                    return isNaN(element) && element != "point";
-                })
-
-                if (valueToOperate.includes("point") && valueToOperate.indexOf("point", indexOfOperator) > 0) { return console.log("there is a point")}
-                else if(dog.length > 1) { return console.log(dog.length) }
-                else {
-                    valueToDisplay.push(e.target.textContent);
-                    valueToOperate.push(e.target.name);
-                    currentDisplayValue.textContent = valueToDisplay.join("");
-                    return
-                }
+    /*          --- substract functions ---         */
+    if (e.target.name === "substract") {
+        // prevents adding two consecutive substract signs
+        if (valueToOperate[valueToOperate.length - 1] === "substract" ||
+            valueToOperate[valueToOperate.length - 1] === "point") { return console.log("no consecutive substracts/.") }
+        
+        // IF THE LAST VALUE OF VALUE TO OPERATE IS ADD, REPLACE IT WITH SUBSTRACT
+        if (valueToOperate[valueToOperate.length - 1] === "add") {
+            valueToOperate.splice(valueToOperate.length - 1, 1, "substract");
+            valueToDisplay.splice(valueToOperate.length - 1, 1, "-");
+            currentDisplayValue.textContent = valueToDisplay.join("");
+            return;
         }
-        else { return console.log("thats it") } 
+
+        // there should only be two susbtracts, one can be the for the first operand and one for the second one
+        if (valueToOperate.indexOf("substract", 1) > 0) {
+            // CHECK HERE!
+            updateResultValue()
+                    valueToOperate.push("substract")
+                    valueToDisplay.push("-")
+                    currentDisplayValue.textContent = valueToDisplay.join("");
+                    console.log(valueToOperate)
+            return console.log("substract already") 
+        }
     }
 
+    
+    /*          --- point functions ---         */
+    if (e.target.name === "point") {
+        // prevents adding two consecutive points
+        if (valueToOperate[valueToOperate.length - 1] === "point") { return console.log("no consecutive points") }
+
+        if (valueToOperate.includes("point")) {
+            if (indexOperator() === -1) { return console.log("!!!no more points when there is only one value") }
+            if (valueToOperate.indexOf("point", indexOperator()) > 0) { return console.log("there is a point") }
+            else { return updateOperatorValue(e); }
+        }
+    }
+
+
+    /*          --- equal functions ---         */
     // returns the result by calling resultValue()
     if (e.target.name === "equals") {
-        if(valueToOperate.length === 0) return;
-        return resultValue();
+        if(valueToOperate.length === 0) { return }
+        // returns if there is only one value to operate
+        if (indexOperator() === -1) { return }
+        updateResultValue();
+        equalsFlag = 1;
+        return 
     };
-
-
-
-
-
-
-
-    // there should only be two susbtracts, one can be the for the first operand and one for the second one
-    if (e.target.name === "substract" && valueToOperate.indexOf("substract", 1) > 0 && e.target.name != "point") {
-        // CHECK HERE!
-        resultValue()
-                valueToOperate.push("substract")
-                valueToDisplay.push("-")
-                currentDisplayValue.textContent = valueToDisplay.join("");
-                console.log(valueToOperate)
-        return console.log("substract already") 
-    }
+    
 
     // prevents adding more operators if there is already one 
-    if ((valueToOperate.includes("add") || valueToOperate.includes("multiply") || valueToOperate.includes("divide"))
-        && e.target.name != "point") {
-            let indexOfOperator = valueToOperate.findIndex((element, index) => {
-                return isNaN(element) && element != "point" && index > 0;
-            })
-            let numberAfterOperator = valueToOperate.some((element, index) => {
-                return !isNaN(element) && index > indexOfOperator;
+    if ((valueToOperate.includes("add") || valueToOperate.includes("multiply") || valueToOperate.includes("divide") ||
+        valueToOperate.includes("substract")) && e.target.name != "point") {
+            let numberAfterOperator = valueToOperate.some((number, index) => {
+                return !isNaN(number) && index > indexOperator();
             })
 
             // CHECK HERE!
             if (e.target.name === "substract" && numberAfterOperator) {
-                resultValue()
+                updateResultValue()
                 valueToOperate.push("substract")
                 valueToDisplay.push("-")
                 currentDisplayValue.textContent = valueToDisplay.join("");
@@ -107,55 +115,42 @@ addGlobalEventListener("click", ".js-operator", function(e) {
                 return console.log("nemo")
             }
 
-            else if (e.target.name === "substract") {
-                valueToDisplay.push(e.target.textContent);
-                valueToOperate.push(e.target.name);
-                currentDisplayValue.textContent = valueToDisplay.join("");
-                return
-            }
-            else if (e.target.name === "add" && numberAfterOperator) {
-                resultValue()
+            if (e.target.name === "add" && numberAfterOperator) {
+                updateResultValue()
                 valueToOperate.push("add")
                 valueToDisplay.push("+")
                 currentDisplayValue.textContent = valueToDisplay.join("");
                 console.log(valueToOperate)
                 return console.log("nemo")
             }
-            else { return console.log("no more operators") }
+
+            if (e.target.name === "multiply" && numberAfterOperator) {
+                updateResultValue()
+                valueToOperate.push("multiply")
+                valueToDisplay.push("x")
+                currentDisplayValue.textContent = valueToDisplay.join("");
+                console.log(valueToOperate)
+                return console.log("nemo")
+            }
+
+            if (e.target.name === "divide" && numberAfterOperator) {
+                updateResultValue()
+                valueToOperate.push("divide")
+                valueToDisplay.push("÷")
+                currentDisplayValue.textContent = valueToDisplay.join("");
+                console.log(valueToOperate)
+                return console.log("nemo")
+            }
+
+            if(indexOperator() > 0 && e.target.name != "substract") { return console.log("no more operators") }
     }
 
-    let indexOfOperators = valueToOperate.findIndex((element, index) => {
-        return isNaN(element) && element != "point" && index > 0;
-    })
-    let numberAfterOperators = valueToOperate.some((element, index) => {
-        return !isNaN(element) && index > indexOfOperators;
-    })
-    if (e.target.name === "add" && numberAfterOperators) {
-        resultValue()
-        valueToOperate.push("add")
-        valueToDisplay.push("+")
-        currentDisplayValue.textContent = valueToDisplay.join("");
-        console.log(valueToOperate)
-        return console.log("nemo")
-    }
-
-
-
-
-
-
-
-
-
-    valueToDisplay.push(e.target.textContent);
-    valueToOperate.push(e.target.name);
-    currentDisplayValue.textContent = valueToDisplay.join("");
-    console.log(valueToOperate.length)
+    updateOperatorValue(e);
     console.log(valueToOperate)  
     }
 )
 
-/* --- operator functions --- */
+/*          --- operator functions ---          */
 function add(...operand) {
     console.log(operand.reduce((total, currentValue) => total + currentValue))
     return operand.reduce((total, currentValue) => total + currentValue)
@@ -180,31 +175,43 @@ function operate(operator, ...operand) {
     if(operator === "divide") { return divide(...operand) }
 }
 
-/* --- result functions --- */
+/*          --- result functions ---            */
 
-function resultValue() {
-    const isOperator = valueToOperate.findIndex((operator, index) => {
-                        return isNaN(operator) && operator != "point" && index > 0;
-    })
+function updateResultValue() {
     let leftOperand = [];
     let rightOperand = [];
 
-    for(let i = 0; i < isOperator; i++) {
+    for(let i = 0; i < indexOperator(); i++) {
         if (valueToOperate[i] === "substract") { leftOperand.push("-") }
         else if (valueToOperate[i] === "point") { leftOperand.push(".") }
         else if (typeof valueToOperate[i] === "number") { leftOperand.push(valueToOperate[i]) }
         else { leftOperand.push(parseInt(valueToOperate[i])) }
     }
-    for(let i = isOperator + 1; i < valueToOperate.length; i++) {
+    for(let i = indexOperator() + 1; i < valueToOperate.length; i++) {
         if (valueToOperate[i] === "substract") { rightOperand.push("-") }
         else if (valueToOperate[i] === "point") { rightOperand.push(".") }
         else { rightOperand.push(parseInt(valueToOperate[i])) }
     }
     console.log(`the left operand is: ${leftOperand}`)
     console.log(`the right operand is: ${rightOperand}`)
-    result = operate(valueToOperate[isOperator], Number (leftOperand.join("")), Number (rightOperand.join("")));
+    result = operate(valueToOperate[indexOperator()], Number (leftOperand.join("")), Number (rightOperand.join("")));
     resultDisplayValue.textContent = result;
     valueToDisplay = [result];
     valueToOperate = [result];
     return console.log(valueToOperate)
+}
+
+function updateOperatorValue(e) {
+    valueToDisplay.push(e.target.textContent);
+    valueToOperate.push(e.target.name);
+    currentDisplayValue.textContent = valueToDisplay.join("");
+}
+
+
+/*          --- etc ---         */
+function indexOperator() {
+    let index = valueToOperate.findIndex((operator, index) => {
+        return isNaN(operator) && operator != "point" && index > 0;
+    })
+    return index;
 }
