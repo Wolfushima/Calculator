@@ -6,8 +6,14 @@ const currentDisplayValue = document.querySelector(".js-currentValue");
 const resultDisplayValue = document.querySelector(".js-resultValue")
 
 addGlobalEventListener("click", ".js-delete", () => {
-    console.log(`%cResult= ${result}`, "color:blue;")
-    console.log(`%cValue= ${valueToDisplay}`, "color:green")
+    /*          --- CHECK ---           */
+    if (resultDisplayValue.textContent != "0") {
+        resultDisplayValue.textContent = "0";
+    }
+    valueToDisplay.pop();
+    valueToOperate.pop();
+    currentDisplayValue.textContent = valueToDisplay.join("");
+    return
 })
 
 function addGlobalEventListener(type, selector, callback) {
@@ -31,6 +37,8 @@ addGlobalEventListener("click", ".js-number", function(e) {
 )
 
 addGlobalEventListener("click", ".js-allClear", function() {
+    result = 0;
+    equalsFlag = 0;
     valueToDisplay = [];
     valueToOperate = [];
     currentDisplayValue.textContent = "";
@@ -102,7 +110,8 @@ addGlobalEventListener("click", ".js-operator", function(e) {
     if ((valueToOperate.includes("add") || valueToOperate.includes("multiply") || valueToOperate.includes("divide") ||
         valueToOperate.includes("substract")) && e.target.name != "point") {
             let numberAfterOperator = valueToOperate.some((number, index) => {
-                return !isNaN(number) && index > indexOperator();
+                if (indexOperator() === -1) { return false }
+                else return !isNaN(number) && index > indexOperator();
             })
 
             // CHECK HERE!
@@ -145,7 +154,7 @@ addGlobalEventListener("click", ".js-operator", function(e) {
             if(indexOperator() > 0 && e.target.name != "substract") { return console.log("no more operators") }
     }
 
-    updateOperatorValue(e);
+    return updateOperatorValue(e);
     console.log(valueToOperate)  
     }
 )
