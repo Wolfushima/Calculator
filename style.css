@@ -24,6 +24,7 @@ body {
     background-color: #08042c;
     background-image: url(Images/Endless-Constellation.svg); /* background by SVGBackgrounds.com */
     backdrop-filter: blur(1px);
+    touch-action: manipulation;
 }
 
 .calculator-container {
